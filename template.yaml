@@ -1,0 +1,186 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Portal de equipo con tablero de notas - arquitectura completa
+
+Parameters:
+  DatabaseUrl:
+    Type: String
+    Description: Cadena de conexión a la base de datos (usada por la Lambda de métricas)
+
+  DBPassword:
+    Type: String
+    NoEcho: true
+    Description: Contraseña para la base de datos RDS
+    MinLength: 8
+
+  EcrImageUri:
+    Type: String
+    Description: URI de la imagen Docker de la API subida a Amazon ECR (ej. 123456789.dkr.ecr.us-east-1.amazonaws.com/portal-api:latest)
+
+  KeyPairName:
+    Type: String
+    Description: Nombre de un par de llaves EC2 existente, para poder conectarte por SSH (opcional para la demo)
+    Default: ""
+
+Resources:
+  # ---------- LAMBDA (métricas del dashboard) ----------
+  MetricasFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: metricas-dashboard
+      Handler: handler.handler
+      Runtime: nodejs22.x
+      CodeUri: lambda/
+      Timeout: 10
+      Environment:
+        Variables:
+          DATABASE_URL: !Ref DatabaseUrl
+      Events:
+        MetricasApi:
+          Type: Api
+          Properties:
+            Path: /metricas
+            Method: get
+
+  # ---------- BASE DE DATOS (RDS PostgreSQL) ----------
+  DBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Permite acceso a Postgres solo desde la EC2 de la API
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !GetAtt ApiSecurityGroup.GroupId
+
+  BaseDeDatos:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      Engine: postgres
+      DBInstanceClass: db.t3.micro
+      AllocatedStorage: 20
+      DBName: portal_db
+      MasterUsername: portal_user
+      MasterUserPassword: !Ref DBPassword
+      VPCSecurityGroups:
+        - !GetAtt DBSecurityGroup.GroupId
+      PubliclyAccessible: false
+
+  # ---------- EC2 (API dentro de Docker) ----------
+  ApiSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Permite trafico HTTP a la API y SSH para administracion
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+  ApiInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.micro
+      ImageId: "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64}}"
+      KeyName: !Ref KeyPairName
+      SecurityGroupIds:
+        - !Ref ApiSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y docker
+          systemctl enable docker
+          systemctl start docker
+          docker pull ${EcrImageUri}
+          docker run -d --restart always -p 3000:3000 \
+            -e DATABASE_URL="postgresql://portal_user:${DBPassword}@${BaseDeDatos.Endpoint.Address}:5432/portal_db" \
+            -e JWT_SECRET="cambia_esto_en_produccion" \
+            ${EcrImageUri}
+
+  # ---------- S3 (archivos del frontend) ----------
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${FrontendBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+
+  # ---------- CloudFront (distribuye el frontend) ----------
+  CloudFrontOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: portal-frontend-oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        Origins:
+          - Id: FrontendOrigin
+            DomainName: !GetAtt FrontendBucket.RegionalDomainName
+            OriginAccessControlId: !Ref CloudFrontOAC
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+        DefaultCacheBehavior:
+          TargetOriginId: FrontendOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD]
+          CachedMethods: [GET, HEAD]
+          ForwardedValues:
+            QueryString: false
+        # Para que las rutas de React (ej. /tablero) no den 404 en CloudFront:
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+
+Outputs:
+  MetricasApiUrl:
+    Description: URL de la API de metricas (Lambda)
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/metricas"
+
+  ApiPublicIp:
+    Description: IP publica de la instancia EC2 con la API
+    Value: !GetAtt ApiInstance.PublicIp
+
+  BaseDeDatosEndpoint:
+    Description: Endpoint de la base de datos RDS
+    Value: !GetAtt BaseDeDatos.Endpoint.Address
+
+  FrontendUrl:
+    Description: URL del frontend servido por CloudFront
+    Value: !Sub "https://${CloudFrontDistribution.DomainName}"
+
+  FrontendBucketName:
+    Description: Nombre del bucket S3 donde se sube el frontend compilado
+    Value: !Ref FrontendBucket

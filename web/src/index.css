@@ -1,0 +1,53 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background-color: #f4f4f4;
+}
+
+/* Identidad visual compartida: no cambia la lógica de las vistas. */
+:root { color: #202344; }
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+
+.login-card { position: relative; margin: 0 auto !important; padding: 42px !important; overflow: hidden; border: 1px solid rgba(255,255,255,.65); border-radius: 25px !important; background: rgba(255,255,255,.96) !important; box-shadow: 0 24px 60px rgba(44,33,115,.32) !important; }
+.login-card::before { content: '✦  Portal equipo'; display: block; margin: -8px 0 12px; color: #6958d4; font-size: .76rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+.login-card h2 { margin: 0 0 8px; color: #252356; font-size: 2rem; }
+.login-card form { margin-top: 26px; }
+.login-card label { color: #414467; font-size: .88rem; font-weight: 700; }
+.login-card input { border: 1px solid #deddf0 !important; border-radius: 10px; outline: none; background: #fbfaff; transition: .2s; }
+.login-card input:focus { border-color: #7c68e6 !important; box-shadow: 0 0 0 4px #766de225; }
+.login-card button[type='submit'] { border: 0; border-radius: 10px; color: white; font-weight: 800; background: linear-gradient(135deg,#665ddd,#a151d4); box-shadow: 0 8px 20px #5d54ce50; transition: transform .2s; }
+.login-card button[type='submit']:hover { transform: translateY(-2px); }
+.login-card hr { border: 0; border-top: 1px solid #e8e6f4; }
+.login-card > p { padding: 12px; border-radius: 9px; background: #f3f1ff; }
+body:has(.login-card) { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at 8% 10%,#ffcc72 0 7%,transparent 24%), radial-gradient(circle at 90% 85%,#8d78ff 0 8%,transparent 30%), linear-gradient(135deg,#403695,#5d57d9 55%,#353184); }
+
+.dashboard-page { min-height: 100vh; padding: 0 clamp(22px,5vw,78px) 60px !important; background: linear-gradient(180deg,#eef0ff 0,#f9faff 42%,#fff 100%); }
+.dashboard-page > div:first-child { min-height: 82px; align-items: center; margin-bottom: 0 !important; }
+.dashboard-page .logout-button { margin-left: 8px; padding: 7px 10px; border: 0; border-radius: 8px; color: #6d668a; font-size: .82rem; font-weight: 800; background: #ecebfa; transition: color .2s,background .2s; }.dashboard-page .logout-button:hover { color: #b23c59; background: #ffecef; }
+.dashboard-page a { color: #5549bc; font-weight: 800; text-decoration: none; }.dashboard-page a:hover { text-decoration: underline; }
+.dashboard-page h2 { margin: 42px 0 9px; color: #242653; font-size: clamp(2.4rem,5vw,4rem); letter-spacing: -.045em; }.dashboard-page h2::after { content: 'Visualiza el avance de tus ideas y mantén a tu equipo en sintonía.'; display: block; max-width: 520px; margin-top: 14px; color: #737997; font-family: system-ui,sans-serif; font-size: 1rem; font-weight: 400; letter-spacing: 0; line-height: 1.5; }
+.dashboard-page > button { margin: 24px 0 8px; padding: 11px 16px; border: 0; border-radius: 10px; color: white; font-weight: 800; background: linear-gradient(135deg,#665ddd,#a151d4); box-shadow: 0 8px 18px #605bd040; }
+.dashboard-page > div:last-child { display: grid !important; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 18px !important; margin-top: 26px !important; }
+.dashboard-page > div:last-child > div { position: relative; min-width: 0 !important; min-height: 160px; padding: 24px !important; overflow: hidden; border: 1px solid #fff; border-radius: 20px !important; box-shadow: 0 12px 28px rgba(58,60,119,.1); transition: transform .2s; }.dashboard-page > div:last-child > div:hover { transform: translateY(-4px); }
+.dashboard-page > div:last-child > div:first-child { background: #dcd8ff !important; color: #39306d; }.dashboard-page > div:last-child > div:nth-child(2) { background: #ffe4a5 !important; color: #875517; }.dashboard-page > div:last-child > div:nth-child(3) { background: #b9e6ff !important; color: #155e86; }.dashboard-page > div:last-child > div:last-child { background: #bcebc9 !important; color: #20714d; }
+.dashboard-page h3 { margin: 18px 0 4px; font-size: 2.7rem; }.dashboard-page h3::before { content: '✦'; display: block; font-size: 1.15rem; }.dashboard-page > div:last-child p { margin: 0; font-weight: 800; }
+
+.board-page { height: 100vh; overflow: hidden; background: #f3f4ff; }.board-page > div:first-child { position: relative; z-index: 2; min-height: 72px; padding: 0 28px !important; align-items: center; border: 0 !important; background: #fff !important; box-shadow: 0 3px 18px rgba(55,59,113,.09); }.board-page button { border: 0; border-radius: 9px; font-weight: 800; }.board-page > div:first-child button:first-child { padding: 10px 14px; color: #fff; background: linear-gradient(135deg,#665ddd,#a151d4); }.board-page a { margin-left: 9px; color: #5549bc; font-weight: 800; text-decoration: none; }.board-canvas { height: calc(100vh - 72px) !important; background-color: #f5f4ff !important; background-image: radial-gradient(#cbc8ec 1.2px,transparent 1.2px); background-size: 24px 24px; }
+.sticky-note { width: 245px !important; padding: 15px !important; border: 1px solid #fff9; border-radius: 15px !important; box-shadow: 0 12px 24px rgba(45,42,89,.18) !important; transition: transform .2s,box-shadow .2s; }.sticky-note:hover { z-index: 1; transform: translateY(-3px); box-shadow: 0 18px 30px rgba(45,42,89,.26) !important; }.sticky-note input,.sticky-note textarea { outline: 0; }.sticky-note select { border: 1px solid #ffffff9e !important; border-radius: 8px; padding: 6px; background: #ffffff91 !important; }.sticky-note button { padding: 7px; color: #fff; background: #5147b5; }.sticky-note button:last-child { color: #a13c53; background: #fff8; }
+
+/* Administracion de usuarios */
+.admin-page { min-height: 100vh; padding: 0 clamp(22px,5vw,78px) 64px !important; color: #282c51; background: linear-gradient(180deg,#f0efff 0,#fafaff 38%,#fff 100%); }
+.admin-page > div:first-child { min-height: 82px; align-items: center; margin-bottom: 0 !important; }.admin-page > div:first-child > div:last-child { color: #68708d; font-size: .88rem; }.admin-page > div:first-child button { margin-left: 8px; border: 0; border-radius: 8px; padding: 7px 10px; color: #6d668a; font-size: .82rem; font-weight: 800; background: #ecebfa; }.admin-page > div:first-child button:hover { color: #b23c59; background: #ffecef; }
+.admin-page a { display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 9px; color: #5549bc; font-size: .88rem; font-weight: 800; text-decoration: none; background: #eeecff; }.admin-page a + a { margin-left: 6px; }.admin-page a:hover { color: #fff; text-decoration: none; background: #665ddd; }
+.admin-page h2 { margin: 40px 0 32px; color: #252653; font-size: clamp(2.2rem,4.5vw,3.7rem); letter-spacing: -.045em; line-height: 1; }.admin-page h2::before { content: 'GESTION DEL EQUIPO'; display: block; margin-bottom: 11px; color: #756bdd; font-family: system-ui,sans-serif; font-size: .72rem; font-weight: 800; letter-spacing: .11em; }
+.admin-page h3 { margin: 30px 0 14px; color: #30345e; font-size: 1.05rem; }.admin-page h3:first-of-type { margin-top: 0; }
+.admin-page form { margin-bottom: 34px !important; padding: 20px !important; gap: 11px !important; border: 1px solid #e2e1f4; border-radius: 18px; background: #fff; box-shadow: 0 12px 30px rgba(64,62,126,.08); }.admin-page form input,.admin-page form select { min-height: 42px; padding: 9px 11px; border: 1px solid #deddf0; border-radius: 10px; outline: none; color: #343754; background: #fbfbff; transition: .2s; }.admin-page form input { flex: 1 1 170px; }.admin-page form select { flex: 0 1 150px; }.admin-page form input:focus,.admin-page form select:focus,.admin-page td select:focus { border-color: #7c68e6; box-shadow: 0 0 0 3px #766de222; }.admin-page form button { min-height: 42px; padding: 9px 18px; border: 0; border-radius: 10px; color: #fff; font-weight: 800; background: linear-gradient(135deg,#665ddd,#a151d4); box-shadow: 0 7px 15px #605bd03b; }.admin-page form button:hover { transform: translateY(-2px); }
+.admin-page > p { margin: -18px 0 20px; padding: 11px 14px; border-radius: 10px; color: #b42e4b !important; font-size: .88rem; font-weight: 700; background: #fff0f2; }
+.admin-page table { overflow: hidden; border: 0 !important; border-radius: 18px; background: #fff; box-shadow: 0 12px 30px rgba(64,62,126,.09); }.admin-page th { padding: 14px 16px !important; border: 0 !important; color: #676d91; font-size: .73rem; letter-spacing: .06em; text-align: left; text-transform: uppercase; background: #f4f3ff; }.admin-page td { padding: 14px 16px !important; border: 0 !important; border-top: 1px solid #eeedf7 !important; color: #4d5270; font-size: .9rem; }.admin-page tbody tr { transition: background .18s; }.admin-page tbody tr:hover { background: #faf9ff; }.admin-page td:first-child { color: #2e3355; font-weight: 800; }.admin-page td:nth-child(4) { color: #278155; font-weight: 800; }.admin-page td select { padding: 7px 9px; border: 1px solid #deddf0; border-radius: 8px; outline: none; color: #5449a9; font-size: .82rem; font-weight: 700; background: #f5f4ff; }.admin-page td button { min-width: 92px; padding: 7px 10px; border: 0; border-radius: 8px; color: #a33952; font-size: .78rem; font-weight: 800; background: #fff0f3; }.admin-page td button:hover { color: #fff; background: #d54d6c; }
+@media (max-width: 720px) { .dashboard-page > div:last-child { grid-template-columns: repeat(2,minmax(0,1fr)); }.dashboard-page > div:first-child { align-items: flex-start; padding-top: 18px; }.login-card { padding: 30px !important; } }
+@media (max-width: 420px) { .dashboard-page > div:last-child { grid-template-columns: 1fr; }.board-page > div:first-child { padding: 0 14px !important; }.sticky-note { width: 220px !important; } }
