@@ -4,6 +4,8 @@ import Login from './Login';
 import Dashboard from './Dashboard';
 import Tablero from './Tablero';
 import Admin from './admin';
+import CambiarPassword from './CambiarPassword';
+import Historial from './Historial';
 
 function RutaProtegida({ children, soloAdmin }) {
   const { usuario } = useAuth();
@@ -44,6 +46,22 @@ function AppRoutes() {
         element={
           <RutaProtegida soloAdmin>
             <Admin />
+          </RutaProtegida>
+        }
+      />
+      <Route
+        path="/cambiar-password"
+        element={
+          <RutaProtegida>
+            <CambiarPassword />
+          </RutaProtegida>
+        }
+      />
+      <Route
+        path="/historial"
+        element={
+          <RutaProtegida>
+            <Historial />
           </RutaProtegida>
         }
       />

@@ -7,6 +7,12 @@ Parameters:
     Type: String
     Description: Cadena de conexión a la base de datos (usada por la Lambda de métricas)
 
+  JwtSecret:
+    Type: String
+    NoEcho: true
+    Description: Secreto para firmar los tokens de sesión (JWT)
+    MinLength: 16
+
   DBPassword:
     Type: String
     NoEcho: true
@@ -99,7 +105,7 @@ Resources:
           docker pull ${EcrImageUri}
           docker run -d --restart always -p 3000:3000 \
             -e DATABASE_URL="postgresql://portal_user:${DBPassword}@${BaseDeDatos.Endpoint.Address}:5432/portal_db" \
-            -e JWT_SECRET="cambia_esto_en_produccion" \
+            -e JWT_SECRET="${JwtSecret}" \
             ${EcrImageUri}
 
   # ---------- S3 (archivos del frontend) ----------
