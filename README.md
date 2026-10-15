@@ -387,6 +387,6 @@ como parámetros y no están escritos en la plantilla.
 
 ## 14. Registro de entrega
 
-- **Versión entregada (commit):** `COMPLETAR_CON_EL_HASH_DEL_COMMIT`
+- **Versión entregada (commit):** 77434c9 (el único cambio posterior es este registro)
 - **Tiempo efectivo empleado en la Parte 2:** 7 horas 40 minutos
 - **Funcionalidades pendientes:** ver la sección 13 (Limitaciones y pendientes).
